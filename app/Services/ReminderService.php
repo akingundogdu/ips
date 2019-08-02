@@ -35,7 +35,7 @@ class ReminderService implements Reminder
     public function attachTagToCustomer(string $customer_email, int $tag_id)
     {
         $customerId = $this->getCustomerInfo($customer_email)['Id'];
-        (new InfusionsoftController(app(InfusionsoftHelper::class)))->testInfusionsoftIntegrationAddTag($customerId, $tag_id);
+        $this->getInfusionControllerInstance()->testInfusionsoftIntegrationAddTag($customerId, $tag_id);
     }
 
     /**
@@ -354,7 +354,7 @@ class ReminderService implements Reminder
      */
     public function getCustomerInfo(string $customer_email)
     {
-        $response = (new InfusionsoftController(app(InfusionsoftHelper::class)))->testInfusionsoftIntegrationGetEmail($customer_email);
+        $response = $this->getInfusionControllerInstance()->testInfusionsoftIntegrationGetEmail($customer_email);
 
         if (is_bool($response->getData())) {
             return null;
@@ -405,7 +405,6 @@ class ReminderService implements Reminder
         if (!$customer_email) {
             throw new Exception(__('messages.cesbn'));
         }
-
         $customer = $this->getCustomerInfo($customer_email);
         $result = explode(",", $customer['_Products']);
         if ($result && count($result) > 0 && $result[0] != '') {
@@ -413,5 +412,10 @@ class ReminderService implements Reminder
         } else {
             throw new Exception(__('messages.cnfacfu'), 404);
         }
+    }
+
+    private function getInfusionControllerInstance()
+    {
+        return (new InfusionsoftController(app(InfusionsoftHelper::class)));
     }
 }
