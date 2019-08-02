@@ -272,6 +272,12 @@ class ReminderService
      */
     private function getLastCompletedModule(string $course_key, $completedModulesOfUser)
     {
+        $lastModule = $this->getLastModule($course_key);
+        $result = $completedModulesOfUser->where('id', $lastModule->id)->count();
+        if ($result > 0) {
+            return true;
+        }
+        return false;
     }
 
     /**It decisions the next available module of the customer specified course.
