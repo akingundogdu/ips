@@ -238,6 +238,10 @@ class ReminderService
      */
     private function getUserCompletedModules(string $customer_email, string $course_key): Collection
     {
+        $users = User::where('email', $customer_email)->get();
+        $user = User::find($users->first()->id);
+        $modulesOfUser = $user->completed_modules()->where('course_key', $course_key)->orderBy('module_order')->get();
+        return $modulesOfUser;
     }
 
     /**It fetches the customer's detailed information via Infusion API
