@@ -37,6 +37,8 @@ class ReminderService
     {
         $firstCourse = $this->getFirstCourseKey();
         $firstModule = $this->getFirstModule($firstCourse);
+        $tagIdOfFirstCourse = $this->getTagId($firstCourse, $firstModule->module_order);
+        $this->attachTagToCustomer($customer_email, $tagIdOfFirstCourse);
     }
 
     /**
