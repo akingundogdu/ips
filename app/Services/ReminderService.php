@@ -17,12 +17,104 @@ class ReminderService
     {
     }
 
+    /**
+     * @param string $customer_email
+     * @param int $tag_id
+     * @throws Exception
+     */
+    private function attachTagToCustomer(string $customer_email, int $tag_id)
+    {
+    }
+
+    /**
+     * @param string $customer_email
+     * @throws Exception
+     */
+    private function attachTagForFirstCourse(string $customer_email)
+    {
+    }
+
+    /**
+     * @param string $customer_email
+     * @throws Exception
+     */
+    private function attachTagForAllCompletedCourses(string $customer_email)
+    {
+    }
+
+    /**
+     * @param string $customer_email
+     * @return bool
+     * @throws Exception
+     */
+    private function isTheCustomerHasNotCompletedAnyCourses(string $customer_email)
+    {
+    }
+
+    /**
+     * @param string $customer_email
+     * @return bool
+     * @throws Exception
+     */
+    private function isTheCustomerCompletedAllCourses(string $customer_email)
+    {
+    }
+
+    /**
+     * @param string $customer_email
+     * @param string $course_key
+     * @return bool
+     * @throws Exception
+     */
+    private function isTheCustomerCompletedTheRelatedCourse(string $customer_email, string $course_key)
+    {
+    }
+
+    /**
+     * @param array $coursesOfCustomer
+     * @param string $customer_email
+     * @return bool
+     * @throws Exception
+     */
+    private function assignNextAvailableModules(array $coursesOfCustomer, string $customer_email)
+    {
+    }
+
+    /**
+     * @param string $customer_email
+     * @return Module|Model|object|null
+     * @throws Exception
+     */
+    private function handleNextAvailableModulesOfNextCourse(string $customer_email)
+    {
+    }
+
+    /**
+     * @param string $customer_email
+     * @param string $course_key
+     * @return mixed
+     * @throws Exception
+     */
+    private function handleNextAvailableModules(string $customer_email, string $course_key)
+    {
+    }
+
+    /** It decisions to attach tag for customer.
+     *
+     * @param array $coursesOfCustomer
+     * @param string $customer_email
+     * @throws Exception
+     */
+    private function handleTagAttachments(array $coursesOfCustomer, string $customer_email)
+    {
+    }
+
+
     /**It decisions next available course by user.
      * @param string $customer_email
      * @return bool
      * @throws Exception
      */
-
     private function getNextAvailableCourse(string $customer_email)
     {
         return 1;
