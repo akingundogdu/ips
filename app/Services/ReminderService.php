@@ -141,6 +141,13 @@ class ReminderService
      */
     private function handleNextAvailableModules(string $customer_email, string $course_key)
     {
+        $nextAvailableCourse = $this->getNextAvailableCourse($customer_email);
+        $nextAvailableModule = $this->getFirstModule($nextAvailableCourse->course_key);
+        if ($nextAvailableModule) {
+            return $nextAvailableModule;
+        } else {
+            throw new Exception(__('messages.mnf'), 404);
+        }
     }
 
     /** It decisions to attach tag for customer.
