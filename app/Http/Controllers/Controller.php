@@ -10,4 +10,14 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    function success(string $message, int $status)
+    {
+
+    }
+
+    function error(\Exception $exception)
+    {
+
+    }
 }
