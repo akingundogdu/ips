@@ -6,5 +6,6 @@ return [
     'mnfwc' => ':where module can not found for :course_key course.',
     'fcnf' => 'First course can not found.',
     'cnft' => 'Can not found :tagTextTemplate tag.',
-    'mrc' => 'Module reminders completed'
+    'mrc' => 'Module reminders completed',
+    'cnfac' => 'Can not found any course.'
 ];
