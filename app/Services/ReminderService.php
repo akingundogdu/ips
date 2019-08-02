@@ -257,5 +257,16 @@ class ReminderService
      */
     private function getCustomersCourses(string $customer_email)
     {
+        if (!$customer_email) {
+            throw new Exception(__('messages.cesbn'));
+        }
+
+        $customer = $this->getCustomerInfo($customer_email);
+        $result = explode(",", $customer['_Products']);
+        if ($result && count($result) > 0 && $result[0] != '') {
+            return $result;
+        } else {
+            throw new Exception(__('messages.cnfacfu'));
+        }
     }
 }
