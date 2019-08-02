@@ -52,6 +52,16 @@ class ReminderService
      */
     private function isTheCustomerHasNotCompletedAnyCourses(string $customer_email)
     {
+        $userModules = User::with('completed_modules')->where('email', $customer_email)->get();
+        if ($userModules && $userModules->count() > 0) {
+            $completedModules = $userModules->first()->completed_modules;
+            if ($completedModules && $completedModules->count() > 0) {
+                return true;
+            }
+        } else {
+            return false;
+        }
+        return false;
     }
 
     /**
