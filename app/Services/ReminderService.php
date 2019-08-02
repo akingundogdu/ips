@@ -159,6 +159,12 @@ class ReminderService
      */
     private function getLastModule(string $course_key)
     {
+        $modules = $this->getModuleModel($course_key);
+        if ($modules && $modules->count() > 0) {
+            return $modules->last();
+        } else {
+            throw new Exception(__('messages.mnfwc', ['where' => 'Last', 'course_key' => $this->getCourseName($course_key)]), 404);
+        }
     }
 
     /**It fetches first course.
