@@ -222,6 +222,7 @@ class ReminderService
 
     private function getModuleModel(string $course_key)
     {
+        return Module::where('course_key', $course_key)->orderBy('module_order')->get();
     }
 
     /**It fetches course information from database.
