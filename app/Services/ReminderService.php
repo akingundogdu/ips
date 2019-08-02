@@ -24,6 +24,9 @@ class ReminderService
      */
     private function attachTagToCustomer(string $customer_email, int $tag_id)
     {
+        $customerId = $this->getCustomerInfo($customer_email)['Id'];
+        $http = new HttpClientHelper();
+        $http->getWithUrl('infusionsoft_test_add_tag/' . $customerId . '/' . $tag_id);
     }
 
     /**
