@@ -35,6 +35,7 @@ class ReminderService
      */
     private function attachTagForFirstCourse(string $customer_email)
     {
+        $firstCourse = $this->getFirstCourseKey();
     }
 
     /**
