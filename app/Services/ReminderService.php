@@ -8,5 +8,8 @@ namespace App\Services;
  */
 class ReminderService
 {
+    public function assignModuleReminder(string $customer_email)
+    {
 
+    }
 }

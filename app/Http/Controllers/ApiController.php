@@ -17,6 +17,7 @@ class ApiController extends Controller
     public function moduleReminderAssigner(ReminderService $reminderService, string $contact_email)
     {
         try {
+            $reminderService->assignModuleReminder($contact_email);
             return $this->success();
         } catch (\Exception $e) {
             return $this->error($e);
