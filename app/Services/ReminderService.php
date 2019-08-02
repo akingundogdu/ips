@@ -328,6 +328,12 @@ class ReminderService
      */
     private function getNextAvailableModule(string $customer_email, string $course_key)
     {
+        $result = $this->isTheCustomerCompletedTheRelatedCourse($customer_email, $course_key);
+        if ($result) {
+            return $this->handleNextAvailableModulesOfNextCourse($customer_email, $course_key);
+        } else {
+            return $this->handleNextAvailableModules($customer_email, $course_key);
+        }
     }
 
     /**It fetches customer's courses via Infusion API.
