@@ -5,5 +5,6 @@ return [
     'cnfacfu' => 'Can not found any courses for the specified user.',
     'mnfwc' => ':where module can not found for :course_key course.',
     'fcnf' => 'First course can not found.',
-    'cnft' => 'Can not found :tagTextTemplate tag.'
+    'cnft' => 'Can not found :tagTextTemplate tag.',
+    'mrc' => 'Module reminders completed'
 ];
