@@ -71,6 +71,15 @@ class ReminderService
      */
     private function isTheCustomerCompletedAllCourses(string $customer_email)
     {
+        $courses = $this->getCustomersCourses($customer_email);
+        foreach ($courses as $course) {
+            $result = $this->isTheCustomerCompletedTheRelatedCourse($customer_email, $course);
+
+            if (!$result) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
