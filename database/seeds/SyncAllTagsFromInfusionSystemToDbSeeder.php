@@ -15,6 +15,6 @@ class SyncAllTagsFromInfusionSystemToDbSeeder extends Seeder
     {
         $http = new HttpClientHelper();
         $tags = $http->get('api.infusionsoft_test_get_all_tags');
-        //you should import all tags to db.
+        Tag::importTags($tags);
     }
 }
