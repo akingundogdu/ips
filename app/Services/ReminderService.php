@@ -213,6 +213,7 @@ class ReminderService
 
     private function getCourseName(string $course_key)
     {
+        return strtoupper($course_key);
     }
 
     /**It fetches module information from database by course_key
