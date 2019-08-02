@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Helpers\InfusionsoftHelper;
 use App\Services\ReminderService;
-use Illuminate\Http\Request;
-use Response;
 
 class ApiController extends Controller
 {
@@ -18,23 +16,28 @@ class ApiController extends Controller
      */
     public function moduleReminderAssigner(ReminderService $reminderService, string $contact_email)
     {
-        return 200;
+        try {
+            return $this->success();
+        } catch (\Exception $e) {
+            return $this->error($e);
+        }
     }
 
-    private function exampleCustomer() {
+    private function exampleCustomer()
+    {
 
         $infusionsoft = new InfusionsoftHelper();
 
         $uniqid = uniqid();
 
         $infusionsoft->createContact([
-            'Email' => $uniqid.'@test.com',
+            'Email' => $uniqid . '@test.com',
             "_Products" => 'ipa,iea'
         ]);
 
         $user = User::create([
             'name' => 'Test ' . $uniqid,
-            'email' => $uniqid.'@test.com',
+            'email' => $uniqid . '@test.com',
             'password' => bcrypt($uniqid)
         ]);
 
