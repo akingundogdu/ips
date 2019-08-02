@@ -244,6 +244,10 @@ class ReminderService
      */
     private function getCourseModel()
     {
+        return Module::select(['course_key', 'course_order'])
+            ->groupBy(['course_key', 'course_order'])
+            ->orderBy('course_order')
+            ->get();
     }
 
     /** It fetches customer completed modules on course basis.
