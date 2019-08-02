@@ -195,6 +195,7 @@ class ReminderService
 
     private function getFirstCourseKey()
     {
+        return $this->getFirstCourse()->course_key;
     }
 
     /**It fetches all courses of specified user.
