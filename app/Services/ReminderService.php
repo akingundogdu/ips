@@ -161,7 +161,14 @@ class ReminderService
      */
     private function getNextAvailableCourse(string $customer_email)
     {
-        return 1;
+        $courses = $this->getAllCourses();
+        foreach ($courses as $course) {
+            $result = $this->isTheCustomerCompletedTheRelatedCourse($customer_email, $course->course_key);
+            if (!$result) {
+                return $course->course_key;
+            }
+        }
+        return null;
     }
 
     /**It fetches first module of specified course.
