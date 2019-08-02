@@ -12,5 +12,5 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('/module_reminder_assigner/{contact_email}', 'ReminderController@moduleReminderAssigner')->name('api.module_reminder_assigner');
+Route::post('/module_reminder_assigner/{contact_email}', 'ApiController@moduleReminderAssigner')->name('api.module_reminder_assigner');
 
