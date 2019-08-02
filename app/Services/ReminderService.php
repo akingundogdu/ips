@@ -49,6 +49,8 @@ class ReminderService
      */
     private function attachTagForAllCompletedCourses(string $customer_email)
     {
+        $tagId = $this->getTagIdForAllCompletedCourses();
+        $this->attachTagToCustomer($customer_email, $tagId);
     }
 
     /**
