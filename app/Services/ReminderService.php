@@ -228,8 +228,8 @@ class ReminderService
     /**It fetches all courses of specified user.
      * @param string $customer_email
      * @return void
+     * @throws Exception
      */
-
     private function getAllCourses(string $customer_email)
     {
         $courses = $this->getCourseModel($customer_email);
