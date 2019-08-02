@@ -15,6 +15,8 @@ class ReminderService
 {
     public function assignModuleReminder(string $customer_email)
     {
+        $coursesOfCustomer = $this->getCustomersCourses($customer_email);
+        $this->handleTagAttachments($coursesOfCustomer, $customer_email);
     }
 
     /**
