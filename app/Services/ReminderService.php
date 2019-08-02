@@ -36,6 +36,7 @@ class ReminderService
     private function attachTagForFirstCourse(string $customer_email)
     {
         $firstCourse = $this->getFirstCourseKey();
+        $firstModule = $this->getFirstModule($firstCourse);
     }
 
     /**
@@ -222,6 +223,13 @@ class ReminderService
 
     private function getTagId(string $course_key, int $module_order)
     {
+        $tagTextTemplate = 'Start ' . $this->getCourseName($course_key) . ' Module ' . $module_order . ' Reminders';
+        $tags = Tag::where('name', $tagTextTemplate)->get();
+        if ($tags && $tags->count() > 0) {
+            return $tags->first()->id;
+        } else {
+            throw new Exception(__('messages.cnft', ['tagTextTemplate' => $tagTextTemplate]), 404);
+        }
     }
 
     /**It fetches the tag text of the completed course.
