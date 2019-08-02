@@ -129,6 +129,13 @@ class ReminderService
      */
     private function handleTagAttachments(array $coursesOfCustomer, string $customer_email)
     {
+        if ($this->isTheCustomerHasNotCompletedAnyCourses($customer_email) === false) {
+            $this->attachTagForFirstCourse($customer_email);
+        } else if ($this->isTheCustomerCompletedAllCourses($customer_email) === true) {
+            $this->attachTagForAllCompletedCourses($customer_email);
+        } else {
+            $this->assignNextAvailableModules($coursesOfCustomer, $customer_email);
+        }
     }
 
 
