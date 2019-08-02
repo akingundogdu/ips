@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Helpers\HttpClientHelper;
+use App\Http\Helpers\InfusionsoftHelper;
 use App\Tag;
 use Illuminate\Database\Seeder;
 
@@ -14,8 +14,7 @@ class SyncAllTagsFromInfusionSystemToDbSeeder extends Seeder
      */
     public function run()
     {
-        $http = new HttpClientHelper();
-        $tags = $http->get('api.infusionsoft_test_get_all_tags');
-        Tag::importTags($tags);
+        $tags = (app(InfusionsoftHelper::class))->testInfusionsoftIntegrationGetAllTags();
+        Tag::importTags($tags->getData(true));
     }
 }

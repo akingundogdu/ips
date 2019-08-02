@@ -3,7 +3,11 @@
 
 namespace App\Services;
 
-use App\Http\Helpers\HttpClientHelper;
+use App\Http\Controllers\InfusionsoftController;
+use App\Http\Helpers\InfusionsoftHelper;
+use App\Module;
+use App\Tag;
+use App\User;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -11,8 +15,12 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * It manage the decision logic related to Reminder Assigner.
  */
-class ReminderService
+class ReminderService implements Reminder
 {
+    /**
+     * @param string $customer_email
+     * @throws Exception
+     */
     public function assignModuleReminder(string $customer_email)
     {
         $coursesOfCustomer = $this->getCustomersCourses($customer_email);
@@ -24,18 +32,17 @@ class ReminderService
      * @param int $tag_id
      * @throws Exception
      */
-    private function attachTagToCustomer(string $customer_email, int $tag_id)
+    public function attachTagToCustomer(string $customer_email, int $tag_id)
     {
         $customerId = $this->getCustomerInfo($customer_email)['Id'];
-        $http = new HttpClientHelper();
-        $http->getWithUrl('infusionsoft_test_add_tag/' . $customerId . '/' . $tag_id);
+        (new InfusionsoftController(app(InfusionsoftHelper::class)))->testInfusionsoftIntegrationAddTag($customerId, $tag_id);
     }
 
     /**
      * @param string $customer_email
      * @throws Exception
      */
-    private function attachTagForFirstCourse(string $customer_email)
+    public function attachTagForFirstCourse(string $customer_email)
     {
         $firstCourse = $this->getFirstCourseKey();
         $firstModule = $this->getFirstModule($firstCourse);
@@ -47,7 +54,7 @@ class ReminderService
      * @param string $customer_email
      * @throws Exception
      */
-    private function attachTagForAllCompletedCourses(string $customer_email)
+    public function attachTagForAllCompletedCourses(string $customer_email)
     {
         $tagId = $this->getTagIdForAllCompletedCourses();
         $this->attachTagToCustomer($customer_email, $tagId);
@@ -58,7 +65,7 @@ class ReminderService
      * @return bool
      * @throws Exception
      */
-    private function isTheCustomerHasNotCompletedAnyCourses(string $customer_email)
+    public function isTheCustomerHasNotCompletedAnyCourses(string $customer_email)
     {
         $userModules = User::with('completed_modules')->where('email', $customer_email)->get();
         if ($userModules && $userModules->count() > 0) {
@@ -77,7 +84,7 @@ class ReminderService
      * @return bool
      * @throws Exception
      */
-    private function isTheCustomerCompletedAllCourses(string $customer_email)
+    public function isTheCustomerCompletedAllCourses(string $customer_email)
     {
         $courses = $this->getCustomersCourses($customer_email);
         foreach ($courses as $course) {
@@ -96,12 +103,11 @@ class ReminderService
      * @return bool
      * @throws Exception
      */
-    private function isTheCustomerCompletedTheRelatedCourse(string $customer_email, string $course_key)
+    public function isTheCustomerCompletedTheRelatedCourse(string $customer_email, string $course_key)
     {
         //The completion of the last modules of the course is the same as completing them all.
         // In either case, it needs to be the last module.
         // Therefore only one condition is being used in the scenario.
-
         $completedModulesOfUser = $this->getUserCompletedModules($customer_email, $course_key);
         $lastModule = $this->getLastCompletedModule($course_key, $completedModulesOfUser);
         return $lastModule;
@@ -113,7 +119,7 @@ class ReminderService
      * @return bool
      * @throws Exception
      */
-    private function assignNextAvailableModules(array $coursesOfCustomer, string $customer_email)
+    public function assignNextAvailableModules(array $coursesOfCustomer, string $customer_email)
     {
         foreach ($coursesOfCustomer as $course_key) {
             $result = $this->isTheCustomerCompletedTheRelatedCourse($customer_email, $course_key);
@@ -132,7 +138,7 @@ class ReminderService
      * @return Module|Model|object|null
      * @throws Exception
      */
-    private function handleNextAvailableModulesOfNextCourse(string $customer_email)
+    public function handleNextAvailableModulesOfNextCourse(string $customer_email)
     {
         $nextAvailableCourse = $this->getNextAvailableCourse($customer_email);
         $nextAvailableModule = $this->getFirstModule($nextAvailableCourse->course_key);
@@ -149,12 +155,18 @@ class ReminderService
      * @return mixed
      * @throws Exception
      */
-    private function handleNextAvailableModules(string $customer_email, string $course_key)
+    public function handleNextAvailableModules(string $customer_email, string $course_key)
     {
-        $nextAvailableCourse = $this->getNextAvailableCourse($customer_email);
-        $nextAvailableModule = $this->getFirstModule($nextAvailableCourse->course_key);
-        if ($nextAvailableModule) {
-            return $nextAvailableModule;
+        $completedModulesOfUser = $this->getUserCompletedModules($customer_email, $course_key);
+        if (count($completedModulesOfUser) > 0) {
+            $modules = Module::whereIn('id', $completedModulesOfUser->pluck('id'))->orderBy('module_order')->get();
+            $nextAvailableModuleOrder = $modules->last()->module_order + 1;
+        } else {
+            $nextAvailableModuleOrder = 1;
+        }
+        $nextAvailableModule = Module::where('module_order', $nextAvailableModuleOrder)->get();
+        if ($nextAvailableModule && $nextAvailableModule->count() > 0) {
+            return $nextAvailableModule->first();
         } else {
             throw new Exception(__('messages.mnf'), 404);
         }
@@ -166,7 +178,7 @@ class ReminderService
      * @param string $customer_email
      * @throws Exception
      */
-    private function handleTagAttachments(array $coursesOfCustomer, string $customer_email)
+    public function handleTagAttachments(array $coursesOfCustomer, string $customer_email)
     {
         if ($this->isTheCustomerHasNotCompletedAnyCourses($customer_email) === false) {
             $this->attachTagForFirstCourse($customer_email);
@@ -183,13 +195,13 @@ class ReminderService
      * @return bool
      * @throws Exception
      */
-    private function getNextAvailableCourse(string $customer_email)
+    public function getNextAvailableCourse(string $customer_email)
     {
-        $courses = $this->getAllCourses();
+        $courses = $this->getAllCourses($customer_email);
         foreach ($courses as $course) {
             $result = $this->isTheCustomerCompletedTheRelatedCourse($customer_email, $course->course_key);
-            if (!$result) {
-                return $course->course_key;
+            if ($result == false) {
+                return $course;
             }
         }
         return null;
@@ -200,7 +212,7 @@ class ReminderService
      * @return Module|Model|object|null
      * @throws Exception
      */
-    private function getFirstModule(string $course_key)
+    public function getFirstModule(string $course_key)
     {
         $modules = $this->getModuleModel($course_key);
         if ($modules && $modules->count() > 0) {
@@ -215,7 +227,7 @@ class ReminderService
      * @return Module
      * @throws Exception
      */
-    private function getLastModule(string $course_key)
+    public function getLastModule(string $course_key)
     {
         $modules = $this->getModuleModel($course_key);
         if ($modules && $modules->count() > 0) {
@@ -229,7 +241,7 @@ class ReminderService
      * @return mixed
      * @throws Exception
      */
-    private function getFirstCourse()
+    public function getFirstCourse()
     {
         $courses = $this->getCourseModel();
         if ($courses && $courses->count() > 0) {
@@ -244,7 +256,7 @@ class ReminderService
      * @throws Exception
      */
 
-    private function getFirstCourseKey()
+    public function getFirstCourseKey()
     {
         return $this->getFirstCourse()->course_key;
     }
@@ -254,7 +266,7 @@ class ReminderService
      * @return Module[]|Collection|\Illuminate\Support\Collection
      * @throws Exception
      */
-    private function getAllCourses(string $customer_email)
+    public function getAllCourses(string $customer_email)
     {
         $courses = $this->getCourseModel($customer_email);
         if ($courses && $courses->count() > 0) {
@@ -271,7 +283,7 @@ class ReminderService
      * @throws Exception
      */
 
-    private function getTagId(string $course_key, int $module_order)
+    public function getTagId(string $course_key, int $module_order)
     {
         $tagTextTemplate = 'Start ' . $this->getCourseName($course_key) . ' Module ' . $module_order . ' Reminders';
         $tags = Tag::where('name', $tagTextTemplate)->get();
@@ -286,7 +298,7 @@ class ReminderService
      * @return mixed
      */
 
-    private function getTagIdForAllCompletedCourses()
+    public function getTagIdForAllCompletedCourses()
     {
         $tag = Tag::where('name', __('messages.mrc'))->get()->first();
         return $tag->id;
@@ -297,7 +309,7 @@ class ReminderService
      * @return string
      */
 
-    private function getCourseName(string $course_key)
+    public function getCourseName(string $course_key)
     {
         return strtoupper($course_key);
     }
@@ -307,7 +319,7 @@ class ReminderService
      * @return Module[]|Collection|\Illuminate\Support\Collection
      */
 
-    private function getModuleModel(string $course_key)
+    public function getModuleModel(string $course_key)
     {
         return Module::where('course_key', $course_key)->orderBy('module_order')->get();
     }
@@ -315,7 +327,7 @@ class ReminderService
     /**It fetches course information from database.
      * @return Module[]|Collection|\Illuminate\Support\Collection
      */
-    private function getCourseModel()
+    public function getCourseModel()
     {
         return Module::select(['course_key', 'course_order'])
             ->groupBy(['course_key', 'course_order'])
@@ -328,10 +340,9 @@ class ReminderService
      * @param string $course_key
      * @return Collection
      */
-    private function getUserCompletedModules(string $customer_email, string $course_key): Collection
+    public function getUserCompletedModules(string $customer_email, string $course_key): Collection
     {
-        $users = User::where('email', $customer_email)->get();
-        $user = User::find($users->first()->id);
+        $user = User::where('email', $customer_email)->first();
         $modulesOfUser = $user->completed_modules()->where('course_key', $course_key)->orderBy('module_order')->get();
         return $modulesOfUser;
     }
@@ -341,11 +352,15 @@ class ReminderService
      * @return array
      * @throws Exception
      */
-    private function getCustomerInfo(string $customer_email): array
+    public function getCustomerInfo(string $customer_email)
     {
-        $http = new HttpClientHelper();
-        $customer = $http->getWithUrl('/infusionsoft_test_get_by_email/' . $customer_email . '');
-        return $customer;
+        $response = (new InfusionsoftController(app(InfusionsoftHelper::class)))->testInfusionsoftIntegrationGetEmail($customer_email);
+
+        if (is_bool($response->getData())) {
+            return null;
+        }
+
+        return $response->getData(true);
     }
 
     /** It fetches the last completed module of the specified course.
@@ -354,7 +369,7 @@ class ReminderService
      * @return bool
      * @throws Exception
      */
-    private function getLastCompletedModule(string $course_key, $completedModulesOfUser)
+    public function getLastCompletedModule(string $course_key, $completedModulesOfUser)
     {
         $lastModule = $this->getLastModule($course_key);
         $result = $completedModulesOfUser->where('id', $lastModule->id)->count();
@@ -370,10 +385,10 @@ class ReminderService
      * @return int
      * @throws Exception
      */
-    private function getNextAvailableModule(string $customer_email, string $course_key)
+    public function getNextAvailableModule(string $customer_email, string $course_key)
     {
         $result = $this->isTheCustomerCompletedTheRelatedCourse($customer_email, $course_key);
-        if ($result) {
+        if ($result == true) {
             return $this->handleNextAvailableModulesOfNextCourse($customer_email, $course_key);
         } else {
             return $this->handleNextAvailableModules($customer_email, $course_key);
@@ -385,7 +400,7 @@ class ReminderService
      * @return array
      * @throws Exception
      */
-    private function getCustomersCourses(string $customer_email)
+    public function getCustomersCourses(string $customer_email)
     {
         if (!$customer_email) {
             throw new Exception(__('messages.cesbn'));
@@ -396,7 +411,7 @@ class ReminderService
         if ($result && count($result) > 0 && $result[0] != '') {
             return $result;
         } else {
-            throw new Exception(__('messages.cnfacfu'));
+            throw new Exception(__('messages.cnfacfu'), 404);
         }
     }
 }

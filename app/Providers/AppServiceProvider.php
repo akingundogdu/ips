@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Http\Helpers\InfusionsoftHelper;
+use App\Services\Reminder;
 use App\Services\ReminderService;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,8 +26,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(ReminderService::class, function ($app) {
+        $this->app->singleton(Reminder::class, function () {
             return new ReminderService();
+        });
+
+        $this->app->singleton(InfusionsoftHelper::class, function () {
+            return new InfusionsoftHelper();
         });
     }
 }

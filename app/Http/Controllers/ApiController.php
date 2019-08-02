@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Helpers\InfusionsoftHelper;
+use App\Module;
+use App\Services\Reminder;
 use App\Services\ReminderService;
+use App\User;
+use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
@@ -14,10 +18,14 @@ class ApiController extends Controller
      * @param string $contact_email
      * @return int
      */
-    public function moduleReminderAssigner(ReminderService $reminderService, string $contact_email)
+    public function assignReminderToModule(Request $request, Reminder $reminderService)
     {
+        $this->validate($request, [
+           'contact_email' => 'required|email'
+        ]);
+
         try {
-            $reminderService->assignModuleReminder($contact_email);
+            $reminderService->assignModuleReminder($request->get('contact_email'));
             return $this->success();
         } catch (\Exception $e) {
             return $this->error($e);
