@@ -7,5 +7,6 @@ return [
     'fcnf' => 'First course can not found.',
     'cnft' => 'Can not found :tagTextTemplate tag.',
     'mrc' => 'Module reminders completed',
-    'cnfac' => 'Can not found any course.'
+    'cnfac' => 'Can not found any course.',
+    'mnf' => 'Can not found available modules.'
 ];
