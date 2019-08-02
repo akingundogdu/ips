@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Helpers\HttpClientHelper;
+use App\Tag;
 use Illuminate\Database\Seeder;
 
 class SyncAllTagsFromInfusionSystemToDbSeeder extends Seeder
