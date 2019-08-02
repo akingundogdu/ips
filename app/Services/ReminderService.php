@@ -180,6 +180,12 @@ class ReminderService
      */
     private function getFirstCourse()
     {
+        $courses = $this->getCourseModel();
+        if ($courses && $courses->count() > 0) {
+            return $courses->first();
+        } else {
+            throw new Exception(__('messages.fcnf'), 404);
+        }
     }
 
     /**It fetches key of first course.
