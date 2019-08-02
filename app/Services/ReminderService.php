@@ -225,6 +225,12 @@ class ReminderService
 
     private function getAllCourses(string $customer_email)
     {
+        $courses = $this->getCourseModel($customer_email);
+        if ($courses && $courses->count() > 0) {
+            return $courses;
+        } else {
+            throw new Exception(__('messages.cnfac'), 404);
+        }
     }
 
     /**It generates tag text by course_key and module_order to attach for customer.
