@@ -3,7 +3,7 @@
 
 namespace App\Services;
 
-use App\Http\CustomHelper;
+use App\Http\Helpers\HttpClientHelper;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -225,6 +225,9 @@ class ReminderService
      */
     private function getCustomerInfo(string $customer_email): array
     {
+        $http = new HttpClientHelper();
+        $customer = $http->getWithUrl('/infusionsoft_test_get_by_email/' . $customer_email . '');
+        return $customer;
     }
 
     /** It fetches the last completed module of the specified course.
