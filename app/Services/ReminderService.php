@@ -242,6 +242,8 @@ class ReminderService
 
     private function getTagIdForAllCompletedCourses()
     {
+        $tag = Tag::where('name', __('messages.mrc'))->get()->first();
+        return $tag->id;
     }
 
     /**It converts course name to uppercase to use in the database search.
