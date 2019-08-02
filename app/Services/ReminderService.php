@@ -115,6 +115,16 @@ class ReminderService
      */
     private function assignNextAvailableModules(array $coursesOfCustomer, string $customer_email)
     {
+        foreach ($coursesOfCustomer as $course_key) {
+            $result = $this->isTheCustomerCompletedTheRelatedCourse($customer_email, $course_key);
+            if ($result == false) {
+                $nextModule = $this->getNextAvailableModule($customer_email, $course_key);
+                $tagId = $this->getTagId($course_key, $nextModule->module_order);
+                $this->attachTagToCustomer($customer_email, $tagId);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
