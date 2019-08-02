@@ -98,6 +98,13 @@ class ReminderService
      */
     private function isTheCustomerCompletedTheRelatedCourse(string $customer_email, string $course_key)
     {
+        //The completion of the last modules of the course is the same as completing them all.
+        // In either case, it needs to be the last module.
+        // Therefore only one condition is being used in the scenario.
+
+        $completedModulesOfUser = $this->getUserCompletedModules($customer_email, $course_key);
+        $lastModule = $this->getLastCompletedModule($course_key, $completedModulesOfUser);
+        return $lastModule;
     }
 
     /**
