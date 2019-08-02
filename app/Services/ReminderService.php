@@ -124,6 +124,13 @@ class ReminderService
      */
     private function handleNextAvailableModulesOfNextCourse(string $customer_email)
     {
+        $nextAvailableCourse = $this->getNextAvailableCourse($customer_email);
+        $nextAvailableModule = $this->getFirstModule($nextAvailableCourse->course_key);
+        if ($nextAvailableModule) {
+            return $nextAvailableModule;
+        } else {
+            throw new Exception(__('messages.mnf'), 404);
+        }
     }
 
     /**
@@ -227,7 +234,7 @@ class ReminderService
 
     /**It fetches all courses of specified user.
      * @param string $customer_email
-     * @return void
+     * @return Module[]|Collection|\Illuminate\Support\Collection
      * @throws Exception
      */
     private function getAllCourses(string $customer_email)
